@@ -203,7 +203,7 @@ describe("FEBuilder", function () {
     }
   });
 
-  it("should be able to sign with RSA Key pair and stored in IPLD as DID tree", async function () {
+  xit("should be able to sign with RSA Key pair and stored in IPLD as DID tree", async function () {
     await ipld.initialize();
 
     const issuer: X509Info = {
@@ -275,7 +275,7 @@ describe("FEBuilder", function () {
     }
   });
 
-  it("should be able to get the IPLD logs by cid", async function () {
+  xit("should be able to get the IPLD logs by cid", async function () {
     // await ipld.initialize();
     try {
 
