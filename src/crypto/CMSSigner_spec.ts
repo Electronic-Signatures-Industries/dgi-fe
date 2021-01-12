@@ -10,8 +10,7 @@ import { expect } from 'chai';
 
 
 
-const SignedXml = require('web-xml-crypto').SignedXml
-    , fs = require('fs')
+const fs = require('fs')
 
 describe("#cms", function () {
 
