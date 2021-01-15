@@ -55,6 +55,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.3",
     "jwt-ed25519-tn": "0.0.3",
+    "luhn": "^2.4.1",
     "moment": "^2.26.0",
     "multihashing-async": "^0.8.1",
     "noble-bls12-381": "^0.2.3",

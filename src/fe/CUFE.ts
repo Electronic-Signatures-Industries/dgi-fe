@@ -12,8 +12,8 @@ export class CUFE {
 
     }
 
-    @IsInt()
-    public iDoc: number;
+    @IsString()
+    public iDoc: string;
 
     @IsEnum(TipoRuc)
     public dTipoRuc: TipoRuc;
@@ -59,14 +59,15 @@ export class CUFE {
 
 
 export class CUFEBuilder {
-    cufeSequence = ['0'.repeat(64)];
+    cufeSequence = '0'.repeat(64);
     constructor(
         private cufe: CUFE
     ) {
 
     }
 
-    async create() {
+    create(securityCode?: any) {
+        // securityCode = securityCode || Math.floor(Math.random()*10e8);
         // tipo documento
         const tipoDocumento = this.cufe.iDoc.toString().padStart(2, '0');
 
@@ -96,8 +97,23 @@ export class CUFEBuilder {
 
         const tipoEmis = this.cufe.iTpEmis.padStart(2, '0');
 
-        const dseg = Math.floor(Math.random()*10e9);
+        // const dseg = Math.floor(Math.random()*10e8);
 
 
+        this.cufeSequence = [
+            tipoDocumento,
+            tipoContribuyente,
+            ruc,
+            dv,
+            codSucursal,
+            fechaEmision,
+            nrodf,
+            ptofac,
+            tipoEmis,
+            this.cufe.iAmb,
+            securityCode
+        ].join('');
+
+        return this.cufeSequence;
     }
 }
