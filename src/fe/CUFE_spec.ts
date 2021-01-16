@@ -61,7 +61,7 @@ describe("FEBuilder", function () {
     });
 
     it("should be able to create a CUFE", async function () {
-        const testMatch = '011000008-PE-3824-00523-280001201707150000015134001011745018343';
+        const testMatch = '011000008-PE-3824-00523-2800012017071500000151340010117450183432';
         const cufe = new CUFE();
         cufe.iAmb = TipoAmbiente.Produccion;
         cufe.dFechaEm = new Date(2017, 6, 15);
@@ -83,8 +83,8 @@ describe("FEBuilder", function () {
         const cufeBuilder = new CUFEBuilder(cufe);
         const res = cufeBuilder.create('745018343');
 
-        expect(res).equal(testMatch);
-        expect(res.length).equal(64);
+        expect(`FE${res.cufe}${res.dv}`).equal(`FE${testMatch}`);
+        expect(res.cufe.length).equal(63);
     });
 
     xit("should be able to sign with RSA Key pair", async function () {

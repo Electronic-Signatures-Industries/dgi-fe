@@ -1,11 +1,8 @@
 import moment from 'moment';
 import {
-    IsPositive, Min, IsEthereumAddress, MinLength,
-    MaxLength, validateOrReject, arrayMinSize,
-    ArrayMinSize, ArrayMaxSize, Matches, IsInt, IsIn, IsEnum, IsDate, IsString, ValidateNested, IsOptional
-} from 'class-validator';
-import { XMLBuilder } from 'xmlbuilder2/lib/interfaces';
+    Matches, IsInt, IsEnum, IsDate, IsString} from 'class-validator';
 import { RucType, TipoAmbiente, TipoEmision, TipoRuc } from './models';
+const checkdigit = require('checkdigit');
 
 export class CUFE {
     constructor() {
@@ -66,6 +63,31 @@ export class CUFEBuilder {
 
     }
 
+    /**
+     * turns to ascii
+     * @param val 
+     */
+    asciify(val: string) {
+        let arr = [];
+        for (let i = 0;i < val.length; i++) {
+            let char  = parseInt(val.charAt(i), 10);
+            if (['0','1','2','3','4','5','6','7','8','9'].indexOf(val.charAt(i)) === -1){
+                char = val.charCodeAt(i);
+            }
+            
+            if (char > 9) {
+                arr = [parseInt(char.toFixed().substring(1, 2), 10), ...arr];
+            } else {
+                arr = [char, ...arr];
+            }    
+        }
+        return arr.reverse().join('');
+    }
+
+    /**
+     * creates a cufe
+     * @param securityCode security code
+     */
     create(securityCode?: any) {
         // securityCode = securityCode || Math.floor(Math.random()*10e8);
         // tipo documento
@@ -73,7 +95,7 @@ export class CUFEBuilder {
 
         // tipo contribuyente
         const tipoContribuyente = this.cufe.dTipoRuc.toString();
-
+    
         // ruc
         const ruc = this.cufe.dRUC.dRuc;
 
@@ -94,11 +116,8 @@ export class CUFEBuilder {
         
         // ptr fac
         const ptofac = this.cufe.dPtoFacDF.padStart(3, '0');
-
         const tipoEmis = this.cufe.iTpEmis.padStart(2, '0');
-
         // const dseg = Math.floor(Math.random()*10e8);
-
 
         this.cufeSequence = [
             tipoDocumento,
@@ -114,6 +133,10 @@ export class CUFEBuilder {
             securityCode
         ].join('');
 
-        return this.cufeSequence;
+
+        const mod10 = this.asciify(this.cufeSequence);        
+        const digit = checkdigit.mod10.create(mod10);        
+
+        return { cufe: this.cufeSequence, dv: digit };
     }
 }
