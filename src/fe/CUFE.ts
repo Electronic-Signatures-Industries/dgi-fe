@@ -1,6 +1,5 @@
 import moment from 'moment';
-import {
-    Matches, IsInt, IsEnum, IsDate, IsString} from 'class-validator';
+import { Matches, IsInt, IsEnum, IsDate, IsString } from 'class-validator';
 import { RucType, TipoAmbiente, TipoEmision, TipoRuc } from './models';
 const checkdigit = require('checkdigit');
 
@@ -69,17 +68,17 @@ export class CUFEBuilder {
      */
     asciify(val: string) {
         let arr = [];
-        for (let i = 0;i < val.length; i++) {
-            let char  = parseInt(val.charAt(i), 10);
-            if (['0','1','2','3','4','5','6','7','8','9'].indexOf(val.charAt(i)) === -1){
+        for (let i = 0; i < val.length; i++) {
+            let char = parseInt(val.charAt(i), 10);
+            if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].indexOf(val.charAt(i)) === -1) {
                 char = val.charCodeAt(i);
             }
-            
+
             if (char > 9) {
                 arr = [parseInt(char.toFixed().substring(1, 2), 10), ...arr];
             } else {
                 arr = [char, ...arr];
-            }    
+            }
         }
         return arr.reverse().join('');
     }
@@ -95,7 +94,7 @@ export class CUFEBuilder {
 
         // tipo contribuyente
         const tipoContribuyente = this.cufe.dTipoRuc.toString();
-    
+
         // ruc
         const ruc = this.cufe.dRUC.dRuc;
 
@@ -113,7 +112,7 @@ export class CUFEBuilder {
 
         // nro df
         const nrodf = this.cufe.dNroDF.padStart(10, '0');
-        
+
         // ptr fac
         const ptofac = this.cufe.dPtoFacDF.padStart(3, '0');
         const tipoEmis = this.cufe.iTpEmis.padStart(2, '0');
@@ -134,8 +133,8 @@ export class CUFEBuilder {
         ].join('');
 
 
-        const mod10 = this.asciify(this.cufeSequence);        
-        const digit = checkdigit.mod10.create(mod10);        
+        const mod10 = this.asciify(this.cufeSequence);
+        const digit = checkdigit.mod10.create(mod10);
 
         return { cufe: this.cufeSequence, dv: digit };
     }

@@ -1,11 +1,6 @@
+import { KeyConvert, Wallet, X509, X509Info, XmlDsig } from 'xdvplatform-wallet';
+
 import moment from 'moment';
-import {
-  BlockSchema,
-  DIDNodeSchema,
-  DocumentNodeSchema,
-  EventType,
-  LogNodeSchema
-  } from '../storage';
 import { CatBienes } from './models/CatBienes';
 import { DescBienes } from './models/DescBienes';
 import {
@@ -30,18 +25,11 @@ import {
   TipoTransaccionVenta,
   Totales
   } from './models';
-import { DIDDocumentBuilder, DIDMethodXDV } from '../did';
+
 import { eddsa } from 'elliptic';
 import { expect } from 'chai';
 import { FEBuilder, Plantillas } from './FEBuilder';
-// import { IpldClient } from '../ipld';
-import {
-  KeyConvert,
-  Wallet,
-  X509Info,
-  XmlDsig
-  } from '../crypto';
-import { LDCryptoTypes, X509 } from '../crypto';
+
 import { Paises } from './models/Paises';
 import { Ubicaciones } from './models/Ubicaciones';
 
@@ -203,109 +191,4 @@ describe("FEBuilder", function () {
     }
   });
 
-  xit("should be able to sign with RSA Key pair and stored in IPLD as DID tree", async function () {
-    await ipld.initialize();
-
-    const issuer: X509Info = {
-      stateOrProvinceName: 'PA',
-      organizationName: 'RM',
-      organizationalUnitName: 'Engineering',
-      commonName: 'Rogelio Morrell',
-      countryName: 'Panama',
-      localityName: 'Panama'
-    };
-    const rsaKey = await Wallet.getRSA256Standalone();
-
-    const rsaKeyExports = await KeyConvert.getX509RSA(rsaKey);
-    const selfSignedCert = X509.createSelfSignedCertificateFromRSA(
-      rsaKeyExports.pemAsPrivate, rsaKeyExports.pemAsPublic, issuer);
-    try {
-      const signedDocuments = await XmlDsig.signFEDocument(rsaKeyExports.pemAsPrivate, selfSignedCert, latestFEDocument);
-      expect(!!signedDocuments.json).equals(true)
-      expect(!!signedDocuments.xml).equals(true)
-
-
-      // Use another different wallet for creating did
-      const mnemonic = Wallet.generateMnemonic();
-      const opts = { mnemonic, password: '123password' };
-      const keystore = await Wallet.createHDWallet(opts);
-      expect(JSON.parse(keystore).version).equal(3);
-
-      const wallet = await Wallet.unlock(keystore, opts.password);
-
-      const kp = wallet.getEd25519();
-      const kpJwk = await KeyConvert.getEd25519(kp);
-
-      // Create IPFS key storage lock
-      const session = await xdvMethod.createIpldSession(kpJwk.pem);
-      const ldCrypto = await KeyConvert.createLinkedDataJsonFormat(
-        LDCryptoTypes.Ed25519, <any>kp, false);
-
-      // Create DID document with an did-ipid based issuer
-      const did = await DIDDocumentBuilder
-        .createDID({
-          issuer: session.key,
-          verificationKeys: [ldCrypto.toPublicKey()],
-          authenticationKeys: [ldCrypto.toAuthorizationKey()]
-        });
-
-      ipld.setSigner((payload) => {
-        return Promise.resolve(kp.sign(<eddsa.Bytes>payload).toHex());
-      });
-      // DID
-      let didNode = await ipld.createDidNode(did, 'my-ed25519-key');
-      const published = await ipld.ipfsClient.name.publish(didNode.cid);
-      console.log(published)
-      // append json 
-      let documentNode = await ipld.appendDocumentNode(didNode.cid, signedDocuments.json, 'mydoc');
-
-      const blockCid = await ipld.patchBlock(null,
-        [{ cid: didNode.cid, tag: 'mykey' }],
-        [{ cid: documentNode.cid, tag: 'mydoc' }],
-        [{ cids: [didNode.cidLog, documentNode.cidLog], timestamp: moment().unix() }]
-      );
-
-      const node = await ipld.getNode(blockCid, '/');
-
-      expect(node.value.$block).equals(0);
-
-      localStorage['blockCid'] = blockCid;
-    } catch (e) {
-      console.log(e);
-    }
-  });
-
-  xit("should be able to get the IPLD logs by cid", async function () {
-    // await ipld.initialize();
-    try {
-
-      const block = localStorage['blockCid'];
-
-      // get all documents
-      const listDocuments = await ipld.getNode(block, '/document');
-      console.log(listDocuments)
-      expect(!!listDocuments.value).equals(true);
-
-      // get did from document ref
-      const did = await ipld.getNode(listDocuments.value['mydoc'], '/');
-      expect(!!did).equals(true);
-
-      // update blockchain
-      const newnode = await ipld.createNode({
-        testing: true
-      });
-
-
-      const blockCid = await ipld.patchBlock(block,
-        [{ cid: newnode as string, tag: 'newnode' }],
-      );
-
-      const node = await ipld.getNode(blockCid, '/');
-      console.log(node)
-      expect(node.value.$ref.toString()).equals(block.toString());
-
-    } catch (e) {
-      throw e;
-    }
-  });
 });

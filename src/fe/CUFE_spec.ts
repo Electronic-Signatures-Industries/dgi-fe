@@ -1,11 +1,5 @@
+import { KeyConvert, Wallet, X509, X509Info, XmlDsig } from 'xdvplatform-wallet';
 import moment from 'moment';
-import {
-    BlockSchema,
-    DIDNodeSchema,
-    DocumentNodeSchema,
-    EventType,
-    LogNodeSchema
-} from '../storage';
 import { CatBienes } from './models/CatBienes';
 import { DescBienes } from './models/DescBienes';
 import {
@@ -30,18 +24,11 @@ import {
     TipoTransaccionVenta,
     Totales
 } from './models';
-import { DIDDocumentBuilder, DIDMethodXDV } from '../did';
 import { eddsa } from 'elliptic';
 import { expect } from 'chai';
 import { FEBuilder, Plantillas } from './FEBuilder';
 // import { IpldClient } from '../ipld';
-import {
-    KeyConvert,
-    Wallet,
-    X509Info,
-    XmlDsig
-} from '../crypto';
-import { LDCryptoTypes, X509 } from '../crypto';
+
 import { Paises } from './models/Paises';
 import { Ubicaciones } from './models/Ubicaciones';
 
