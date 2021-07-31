@@ -10,3 +10,5 @@ export * from './Utils';
 export * from './CUFE';
 export * from './CAFE';
 export * from './models';
+export * from './X509';
+export * from './XmlDsig';
