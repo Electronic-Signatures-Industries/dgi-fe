@@ -50,7 +50,7 @@
     "hash.js": "^1.1.7",
     "hdkey-secp256r1": "^1.1.0",
     "jose": "^3.14.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwk-to-pem": "^2.0.3",
     "jwt-ed25519-tn": "0.0.3",
     "luhn": "^2.4.1",
